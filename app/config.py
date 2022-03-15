@@ -1,0 +1,3 @@
+DATABASE="app.sqlite"
+PAGE_SIZE=10
+LOGGING_FILENAME="logs.txt"

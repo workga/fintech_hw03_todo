@@ -36,7 +36,13 @@ format: ## Formats all files
 .PHONY: ci
 ci:	lint test ## Lint code then run tests
 
+
+export FLASK_ENV = development
 .PHONY: up
 up: ## Run application
-	$(VENV)/bin/python -m app
+	$(VENV)/bin/flask run
+
+.PHONY: init
+init: ## Init or clear database
+	$(VENV)/bin/flask init-db
 
