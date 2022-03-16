@@ -1,40 +1,50 @@
-from flask import current_app, g
-from flask.cli import with_appcontext
-import click
 import sqlite3
 
+import click
+from flask import Flask, current_app, g
+from flask.cli import with_appcontext
 
-def get_db():
-    if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
-
-    return g.db
+from app.config import DB_FILENAME, SCHEMA_FILENAME
 
 
-def close_db(e=None):
-    db = g.pop('db', None)
+def dict_factory(cursor: sqlite3.Cursor, row: sqlite3.Row):
+    d = {}
+    for i, col in enumerate(cursor.description):
+        d[col[0]] = row[i]
+    return d
 
-    if db is not None:
-        db.close()
+
+def get_db() -> sqlite3.Connection:
+    if not hasattr(g, 'db_connection'):
+        conn = sqlite3.connect(DB_FILENAME)
+        conn.row_factory = dict_factory
+        setattr(g, 'db_connection', conn)
+
+    return g.db_connection
 
 
-def init_db():
+def close_db(error) -> None:
+    if hasattr(g, 'db_connection'):
+        g.db_connection.close()
+
+    if error:
+        current_app.logger.error(error)
+
+
+def init_db() -> None:
     db = get_db()
 
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+    with open(SCHEMA_FILENAME, encoding='utf8') as f:
+        db.executescript(f.read())
 
-def init_app(app):
+
+def init_app(app: Flask) -> None:
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
 
 @click.command('init-db')
 @with_appcontext
-def init_db_command():
+def init_db_command() -> None:
     init_db()
     click.echo('Initialized the database.')

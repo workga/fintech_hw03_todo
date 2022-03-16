@@ -2,7 +2,7 @@
 *.sqlite
 
 # logs
-logs.txt
+todo_logs.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

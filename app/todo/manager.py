@@ -1,63 +1,55 @@
-import math
-
 from app.config import PAGE_SIZE
 from app.db import get_db
+from app.todo import logger
 
-def page_count(tasks_count):
+
+def page_count(tasks_count: int) -> int:
     if tasks_count == 0:
         return 1
-    elif tasks_count % PAGE_SIZE == 0:
-        return tasks_count // PAGE_SIZE
-    else:
-        return tasks_count // PAGE_SIZE + 1
 
-def find_tasks(active_filter, text_filter, page):
+    if tasks_count % PAGE_SIZE == 0:
+        return tasks_count // PAGE_SIZE
+
+    return tasks_count // PAGE_SIZE + 1
+
+
+def find_tasks(active_filter: str, text_filter: str, page: int):
     db = get_db()
     tasks = db.execute(
-        'SELECT * FROM task '
-        'ORDER BY created DESC ',
+        'SELECT * FROM task ' 'ORDER BY created DESC ',
     ).fetchall()
 
-    if active_filter == "active":
-        tasks = [t for t in tasks if t["active"]]
-    elif active_filter == "finished":
-        tasks = [t for t in tasks if not t["active"]]
-    
+    if active_filter == 'active':
+        tasks = [t for t in tasks if t['active']]
+    elif active_filter == 'finished':
+        tasks = [t for t in tasks if not t['active']]
+
     if text_filter:
-        tasks = [t for t in tasks if text_filter in t["text"]]
+        tasks = [t for t in tasks if text_filter in t['text']]
 
     max_page = page_count(len(tasks))
     page = min(page, max_page)
+    tasks = tasks[
+        min(len(tasks) - 1, (page - 1) * PAGE_SIZE) : min(len(tasks), page * PAGE_SIZE)
+    ]
+    return tasks, page, max_page
 
-    return tasks[
-        min(len(tasks) - 1, (page - 1) * PAGE_SIZE) :
-        min(len(tasks), page * PAGE_SIZE)
-    ], page, max_page
 
-def find_task_by_id(id):
+def add_task(text: str) -> None:
     db = get_db()
-    task = db.execute(
-        'SELECT * FROM task '
-        'WHERE id = (?)',
-        (id, )
-    ).fetchone()
-
-    return task
-
-def add_task(text):
-    db = get_db()
-    db.execute(
-        'INSERT INTO task (text) '
-        'VALUES (?)',
-        (text,)
-    )
+    db.execute('INSERT INTO task (text) ' 'VALUES (?)', (text,))
     db.commit()
 
-def finish_task(id):
+    logger.info(f"Added task: '{text}'")
+
+
+def finish_task(task_id: int) -> None:
     db = get_db()
-    db.execute(
-        'UPDATE task SET active = FALSE '
-        'WHERE id = (?)',
-        (id,)
-    )
+    db.execute('UPDATE task SET active = FALSE ' 'WHERE id = (?)', (task_id,))
     db.commit()
+
+    text = db.execute('SELECT * FROM task ' 'WHERE id = (?)', (task_id,)).fetchone()[
+        'text'
+    ]
+
+    logger.info(f"Finished task: '{text}'")

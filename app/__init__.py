@@ -1,20 +1,18 @@
-import logging
 from flask import Flask
 
-from app.config import LOGGING_FILENAME
+from app import db
+from app.todo import logger, view
 
-def create_app():
+
+def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_pyfile('config.py')
 
-    from app import db
     db.init_app(app)
 
-    from app.todo import view
     app.register_blueprint(view.bp)
     app.add_url_rule('/tasks', endpoint='tasks')
 
-    # logging.getLogger('todo').
-    # logging.basicConfig(filename=LOGGING_FILENAME, level=logging.INFO)
+    logger.init()
 
     return app
