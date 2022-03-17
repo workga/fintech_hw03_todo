@@ -64,5 +64,5 @@ def finish_task(task_id: int) -> None:
 
     if task is None:
         return
-    else:
-        logger.info(f"Finished task: '{task['text']}'")
+
+    logger.info(f"Finished task: '{task['text']}'")
