@@ -1,16 +1,45 @@
-# homework3
+# ToDo Web Application
+This is a simple web application that allows you to add and finish the tasks.
 
-### Description:
-    ...
+### Features
+- Filters and search
+- Pagination
+- Logger
 
-### Create venv:
+### Usage
+
+Create venv:
+```bash
     make venv
+```
 
-### Run tests:
+Init and clear database:
+```bash
+    make init
+```
+
+Run application:
+```bash
+    make up
+```
+
+Remove temporary files:
+```bash
+    make clean
+```
+
+### Development
+Run tests:
+```bash
     make test
+```
 
-### Run linters:
+Run linters:
+```bash
     make lint
+```
 
-### Run formatters:
+Run formatters:
+```bash
     make format
+```

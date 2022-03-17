@@ -31,10 +31,10 @@ def close_db(error) -> None:
         current_app.logger.error(error)
 
 
-def init_db() -> None:
+def init_db(filename=SCHEMA_FILENAME) -> None:
     db = get_db()
 
-    with open(SCHEMA_FILENAME, encoding='utf8') as f:
+    with open(filename, encoding='utf8') as f:
         db.executescript(f.read())
 
 

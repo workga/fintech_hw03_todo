@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request
 
 from app.todo import manager
 
@@ -25,19 +25,18 @@ def tasks():
         )
 
     if request.method == 'POST':
-        task_text = request.form['task_text']
+        task_text = request.form.get('task_text', type=str)
 
         manager.add_task(task_text)
 
         return redirect(request.referrer)
 
-    return Response(status=405)
+    return None
 
 
 @bp.route('/tasks/finish', methods=['POST'])
 def tasks_finish():
     task_id = request.form.get('task_id', type=int)
-
     manager.finish_task(task_id)
 
     return redirect(request.referrer)
