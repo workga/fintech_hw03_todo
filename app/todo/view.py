@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 
 from app.todo import manager
 
@@ -29,7 +29,7 @@ def tasks():
 
         manager.add_task(task_text)
 
-        return redirect(request.referrer)
+        return redirect(url_for('tasks'))
 
     return None
 
@@ -39,4 +39,4 @@ def tasks_finish():
     task_id = request.form.get('task_id', type=int)
     manager.finish_task(task_id)
 
-    return redirect(request.referrer)
+    return redirect(url_for('tasks'))

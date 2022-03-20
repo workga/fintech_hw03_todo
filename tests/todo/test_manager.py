@@ -1,6 +1,7 @@
 import pytest
 
 from app.todo import manager
+from tests.todo.conftest import fill_db
 
 
 @pytest.mark.parametrize(
@@ -21,12 +22,12 @@ def test_page_count(tasks_count, page_size, result):
 
 
 @pytest.mark.parametrize(
-    ('text'),
+    'text',
     [
-        ('some task'),
+        'some task',
     ],
 )
-def test_add_task_success(app, db, text):
+def test_add_task_success(db, text):
     manager.add_task(text)
 
     count = db.execute(
@@ -36,13 +37,13 @@ def test_add_task_success(app, db, text):
 
 
 @pytest.mark.parametrize(
-    ('text'),
+    'text',
     [
-        (''),
-        (None),
+        '',
+        None,
     ],
 )
-def test_add_task_fail(app, db, text):
+def test_add_task_fail(db, text):
     manager.add_task(text)
 
     count = db.execute(
@@ -57,7 +58,7 @@ def test_add_task_fail(app, db, text):
         (1, 'some text'),
     ],
 )
-def test_finish_task_success(app, db, task_id, task_text):
+def test_finish_task_success(db, task_id, task_text):
     manager.add_task(task_text)
 
     active = db.execute(
@@ -81,7 +82,7 @@ def test_finish_task_success(app, db, task_id, task_text):
         (None, 'some text'),
     ],
 )
-def test_finish_task_fail(app, db, task_id, task_text):
+def test_finish_task_fail(db, task_id, task_text):
     manager.add_task(task_text)
 
     active = db.execute(
@@ -110,7 +111,8 @@ def test_finish_task_fail(app, db, task_id, task_text):
         ('active', 'D', 1, 2, 0),
     ],
 )
-def test_find_tasks(app, filled_db, active_filter, text_filter, page, page_size, count):
+def test_find_tasks(active_filter, text_filter, page, page_size, count):
+    fill_db()
     tasks, _, _ = manager.find_tasks(
         active_filter=active_filter,
         text_filter=text_filter,

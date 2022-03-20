@@ -1,3 +1,5 @@
+from typing import Optional
+
 from app.config import PAGE_SIZE
 from app.db import get_db
 from app.todo import logger
@@ -41,7 +43,7 @@ def find_tasks(
     return tasks, page, max_page
 
 
-def add_task(task_text: str) -> None:
+def add_task(task_text: Optional[str]) -> None:
     if not task_text:
         return
 
@@ -52,7 +54,7 @@ def add_task(task_text: str) -> None:
     logger.info(f"Added task: '{task_text}'")
 
 
-def finish_task(task_id: int) -> None:
+def finish_task(task_id: Optional[int]) -> None:
     if task_id is None or task_id == -1:
         return
 

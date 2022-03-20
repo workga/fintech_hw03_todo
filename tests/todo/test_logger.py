@@ -7,9 +7,9 @@ from app.todo import logger
 
 
 @pytest.mark.parametrize(
-    ('message'),
+    'message',
     [
-        ('Message'),
+        'Message',
     ],
 )
 def test_logger_success(caplog, message):
@@ -24,10 +24,10 @@ def test_logger_success(caplog, message):
 
 
 @pytest.mark.parametrize(
-    ('message'),
+    'message',
     [
-        (''),
-        (None),
+        '',
+        None,
     ],
 )
 def test_logger_fail(caplog, message):

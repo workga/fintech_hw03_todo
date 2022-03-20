@@ -1,6 +1,8 @@
 import pytest
 from flask import url_for
 
+from tests.todo.conftest import fill_db
+
 
 @pytest.mark.parametrize(
     ('active_filter', 'text_filter', 'page'),
@@ -15,7 +17,8 @@ from flask import url_for
         (None, None, 0),
     ],
 )
-def test_tasks_get(app, filled_db, active_filter, text_filter, page):
+def test_tasks_get(app, active_filter, text_filter, page):
+    fill_db()
     args = {
         'active_filter': active_filter,
         'text_filter': text_filter,
@@ -31,21 +34,21 @@ def test_tasks_get(app, filled_db, active_filter, text_filter, page):
 
 
 @pytest.mark.parametrize(
-    ('task_text'),
+    'task_text',
     [
-        ('some task'),
-        (''),
-        (None),
+        'some task',
+        '',
+        None,
     ],
 )
-def test_tasks_post(mocker, app, db, task_text):
+def test_tasks_post(mocker, app, task_text):
     mocked_add_task = mocker.patch('app.todo.manager.add_task')
 
     with app.test_client() as client:
         response = client.post(
             '/tasks',
             follow_redirects=True,
-            headers={'Referer': '/tasks'},
+            # headers={'Referer': '/tasks'},
             data={'task_text': task_text},
         )
 
@@ -59,20 +62,21 @@ def test_tasks_post(mocker, app, db, task_text):
 
 
 @pytest.mark.parametrize(
-    ('task_id'),
+    'task_id',
     [
-        (1),
-        (None),
+        1,
+        None,
     ],
 )
-def test_tasks_finish_post(mocker, app, filled_db, task_id):
+def test_tasks_finish_post(mocker, app, task_id):
+    fill_db()
     mocked_finish_task = mocker.patch('app.todo.manager.finish_task')
 
     with app.test_client() as client:
         response = client.post(
             '/tasks/finish',
             follow_redirects=True,
-            headers={'Referer': '/tasks'},
+            # headers={'Referer': '/tasks'},
             data={'task_id': task_id},
         )
 
